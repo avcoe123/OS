@@ -1,65 +1,74 @@
-#include<stdio.h>
- #include<stdlib.h>
- #include<unistd.h>
- #include<string.h>
- int main(
- int argc,
- {
- char *argv[])
- int val[10],ele;
- pid_t pid;
- char *cval[10];
- int i,j,n,temp;
- printf("\n Enter the size of array\n");
- scanf("%d",&n);
- printf("\n Enter the numbers\n");
- for(i=0;i<n;i++)
- {
- scanf("%d",&val[i]);
- }
- printf("\n Elements entered are\n");
- for(i=0;i<n;i++)
- printf("%d",val[i]);
- {
- for(i=1;i<n;i++)
- {
- for(j=0;j<n-1;j++)
- {
- if(val[j]>val[j+1])
- {
- temp=val[j];
- val[j]=val[j+1];
- val[j+1]=temp;
- }
- }
- }
- printf("\n Sorted elements are\n:");
- for(i=0;i<n;i++)
- {
- printf("%d",val[i]);
- }
- printf("\n Enter element to search:");
- scanf("%d",&ele);
- val[i]=ele;
- for(i=0;i<n+1;i++)
- {
- char a[
- sizeof(
- int)];
- snprintf(a,
- sizeof(
- int),"%d",val[i]);
- cval[i]=malloc(
- sizeof(a));
- strcpy(cval[i],a);
- }
- cval[i]=NULL;
- pid=fork();
- if(pid==0)
- {
- execv(argv[1],cval);
- perror("\n Error in execv call");
- }
- }
- }
- /*
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) {
+    int val[10], ele;
+    pid_t pid;
+    char *cval[11]; // Increase size to accommodate the null terminator.
+    int i, j, n, temp;
+
+    printf("\nEnter the size of array:\n");
+    scanf("%d", &n);
+
+    if (n > 10) {
+        printf("Size exceeds the limit of 10.\n");
+        return 1;
+    }
+
+    printf("\nEnter the numbers:\n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &val[i]);
+    }
+
+    printf("\nElements entered are:\n");
+    for (i = 0; i < n; i++) {
+        printf("%d ", val[i]);
+    }
+
+    // Bubble sort
+    for (i = 1; i < n; i++) {
+        for (j = 0; j < n - i; j++) {
+            if (val[j] > val[j + 1]) {
+                temp = val[j];
+                val[j] = val[j + 1];
+                val[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("\nSorted elements are:\n");
+    for (i = 0; i < n; i++) {
+        printf("%d ", val[i]);
+    }
+
+    printf("\nEnter element to search: ");
+    scanf("%d", &ele);
+
+    // Convert array elements to strings for execv
+    for (i = 0; i < n; i++) {
+        char a[20]; // Ensure the size can accommodate integers as strings.
+        snprintf(a, sizeof(a), "%d", val[i]);
+        cval[i] = malloc(strlen(a) + 1);
+        strcpy(cval[i], a);
+    }
+    cval[n] = NULL; // Last element should be NULL for execv
+
+    pid = fork();
+    if (pid == 0) {
+        execv(argv[1], cval);
+        perror("\nError in execv call");
+        exit(1); // Ensure the child process exits if execv fails.
+    } else if (pid < 0) {
+        perror("Fork failed");
+        return 1;
+    }
+
+    // Free allocated memory
+    for (i = 0; i < n; i++) {
+        free(cval[i]);
+    }
+
+    return 0;
+}
